@@ -1,41 +1,176 @@
-{%extends 'basetemplate.html'%}
+{% extends 'base.html' %}
 
-{%block search_bar%}
+{% block search_bar %}
 <div class="search">
-    <input type="search" class="search-bar" placeholder="Search for {{page_title}}">
+    <input type="search" class="search-bar" placeholder="Search for {{ page_title }}">
 </div>
-{%endblock%}
+{% endblock %}
 
-{%block content%}
+{% block content %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{page_title}}</title>
-
+    <title>{{ page_title }}</title>
     <style>
-        .members_container{
-            margin-left: auto;
-            width: 82%;
-            margin-top: -500px;
-            height: 88vh;    
-            display: block;
-        }
-       
-        
-    </style>
 
+        .container {
+          margin-left: 300px;
+            width: 80%;
+            margin-top: -500px;
+        }
+        .class-list {
+            margin-bottom: 20px;
+        }
+        .schedule-btn {
+            padding: 12px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .schedule-btn:hover {
+            background: #0056b3;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+        .booking-form {
+            background: #fff;
+            padding: 30px;
+            max-width: 600px;
+            margin: 50px auto;
+            border-radius: 12px;
+            position: relative;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .booking-form h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .form-group {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        select, input, textarea {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        .submit-btn {
+            padding: 12px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .submit-btn:hover {
+            background: #0056b3;
+        }
+    </style>
 </head>
 <body>
-        <div class="members_container">
-            <div class="report">
-                <div class="details">
-                    <h1>Code from here</h1>
-                </div>
+    <div class="container">
+        <div class="class-list">
+            {% if classes %}
+                <ul>
+                    {% for cls in classes %}
+                        <li>{{ cls.name }} - {{ cls.date }} at {{ cls.time }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <h2>No classes scheduled.</h2>
+            {% endif %}
+        </div>
+
+        <!-- Schedule Class Button -->
+        <button class="schedule-btn" onclick="document.getElementById('scheduleModal').style.display='block'">
+            Schedule a Class
+        </button>
+
+        <!-- Modal -->
+        <div id="scheduleModal" class="modal">
+            <div class="booking-form">
+                <span class="close-modal" onclick="document.getElementById('scheduleModal').style.display='none'">&times;</span>
+                <h2>Book a Class</h2>
+                <form>
+                    <div class="form-group">
+                        <label for="category">Category</label>
+                        <select id="category">
+                            <option value="">Select Category</option>
+                            <option value="yoga">Yoga</option>
+                            <option value="fitness">Fitness</option>
+                            <option value="dance">Dance</option>
+                            <option value="martial-arts">Martial Arts</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="trainer">Trainer / Instructor</label>
+                        <select id="trainer">
+                            <option value="">Select Trainer</option>
+                            <!-- Dynamically populated based on category if needed -->
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="date">Date</label>
+                        <input type="date" id="date" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="time">Time</label>
+                        <input type="time" id="time" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="duration">Duration (minutes)</label>
+                        <input type="number" id="duration" placeholder="e.g. 60" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="location">Location / Room</label>
+                        <input type="text" id="location" placeholder="e.g. Room 101" />
+                    </div>
+
+                
+                    <button type="submit" class="submit-btn">Book Class</button>
+                </form>
             </div>
-         
+        </div>
+    </div>
+
+    <script>
+        // Close modal when clicking outside the form
+        window.onclick = function(event) {
+            var modal = document.getElementById('scheduleModal');
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
 </body>
 </html>
-
-{%endblock%}
+{% endblock %}

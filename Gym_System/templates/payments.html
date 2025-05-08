@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="payment-section">
+    <h2>Make a Subscription Payment</h2>
+
+    <form id="paymentForm" class="payment-form">
+        <div class="form-group">
+            <label for="memberId">Member ID</label>
+            <input type="text" id="memberId" name="memberId" required>
+        </div>
+
+        <div class="form-group">
+            <label for="subscriptionType">Subscription Type</label>
+            <select id="subscriptionType" name="subscriptionType" required>
+                <option value="">Select</option>
+                <option value="Basic">Basic</option>
+                <option value="Premium">Premium</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="amount">Amount (ZAR)</label>
+            <input type="number" id="amount" name="amount" min="0" step="0.01" required>
+        </div>
+
+        <div class="form-group">
+            <label for="paymentMethod">Payment Method</label>
+            <select id="paymentMethod" name="paymentMethod" required>
+                <option value="">Select</option>
+                <option value="Card">Card</option>
+                <option value="Bank Transfer">Bank Transfer</option>
+                <option value="Cash">Cash</option>
+            </select>
+        </div>
+
+        <button type="submit" class="submit-btn">Submit Payment</button>
+    </form>
+</div>
+
+<script>
+    document.getElementById('paymentForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        // TODO: Send to backend (AJAX or form POST)
+        alert('Payment submitted successfully!');
+        this.reset();
+    });
+</script>
+
+<style>
+    .payment-section {
+        margin-left: 480px;
+        width: 95%;
+        margin-top: -520px;
+    }
+
+    .payment-form {
+        background: #fff;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        max-width: 400px;
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 0.3rem;
+        font-weight: bold;
+    }
+
+    input, select {
+        width: 100%;
+        padding: 0.6rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .submit-btn {
+        padding: 0.7rem 1.5rem;
+        background: #4CAF50;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .submit-btn:hover {
+        background: #45a049;
+    }
+</style>
+{% endblock %}

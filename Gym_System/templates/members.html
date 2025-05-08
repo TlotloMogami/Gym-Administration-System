@@ -1,41 +1,325 @@
-{%extends 'basetemplate.html'%}
+{% extends 'base.html' %}
 
-{%block search_bar%}
+{% block search_bar %}
 <div class="search">
-    <input type="search" class="search-bar" placeholder="Search for {{page_title}}">
+    <input type="search" class="search-bar" placeholder="Search for {{ page_title }}">
 </div>
-{%endblock%}
+{% endblock %}
 
-{%block content%}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{page_title}}</title>
+{% block content %}
+<div class="member-section">
+    <h2>Member Management</h2>
+    <button class="add-btn">+ Add Member</button>
 
-    <style>
-        .members_container{
-            margin-left: auto;
-            width: 82%;
-            margin-top: -500px;
-            height: 88vh;    
-            display: block;
+    <div class="table-wrapper">
+        <div class="table-container">
+            <table width="90%">
+                <thead class="table-head">
+                    <tr>
+                        <th>Member_ID</th>
+                        <th>Name</th>
+                        <th>Membership Type</th>
+                        <th>Status</th>
+                        <th>Joined</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="memberTableBody">
+                    <tr class="no-members-row">
+                        <td colspan="6" style="text-align: center; padding: 1rem; color: gray;">No members available.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add Member Modal -->
+<div id="addModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeAddModal()">&times;</span>
+        <h3>Add New Member</h3>
+        <form id="addForm">
+            <label>Name:</label>
+            <input type="text" id="addName" required>
+            <label>Gender:</label>
+            <select id="addGender">
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+            </select>
+            <label>Date of birth:</label>
+            <input type="date" id="addDOB" required>
+            <label>Membership Type:</label>
+            <select id="addMembership">
+                <option value="Basic">Basic</option>
+                <option value="Premium">Premium</option>
+            </select>
+            <label>Status:</label>
+            <select id="addStatus">
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+            </select>
+            <label>Joined Date:</label>
+            <input type="date" id="addJoined" required>
+            <label>Email:</label>
+            <input type="email" id="addEmail" required>
+            <label>Phone:</label>
+            <input type="text" id="addPhone" required>
+            <label>Address:</label>
+            <input type="text" id="addAddress">
+            <button type="submit" class="save-btn">Add Member</button>
+        </form>
+    </div>
+</div>
+
+<!-- Combined Modal for View/Edit/Delete -->
+<div id="universalModal" class="modal">
+    <div class="modal-content" id="modalContent"></div>
+</div>
+
+<script>
+    const modal = document.getElementById("universalModal");
+    const modalContent = document.getElementById("modalContent");
+
+    function showModal(contentHtml) {
+        modalContent.innerHTML = contentHtml;
+        modal.style.display = 'block';
+    }
+
+    function closeModal() {
+        modal.style.display = 'none';
+        modalContent.innerHTML = '';
+    }
+
+    function openViewModal(name, gender, dob, membership, status, joined, email, phone, address) {
+        const html = `
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h3>Member Details</h3>
+            <p><strong>Name:</strong> ${name}</p>
+            <p><strong>Gender:</strong> ${gender}</p>
+            <p><strong>Date of Birth:</strong> ${dob}</p>
+            <p><strong>Membership Type:</strong> ${membership}</p>
+            <p><strong>Status:</strong> ${status}</p>
+            <p><strong>Joined:</strong> ${joined}</p>
+            <p><strong>Email:</strong> ${email}</p>
+            <p><strong>Phone:</strong> ${phone}</p>
+            <p><strong>Address:</strong> ${address}</p>
+        `;
+        showModal(html);
+    }
+
+    function openEditModal(name, gender, dob, membership, status, joined, email, phone, address) {
+        const html = `
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h3>Edit Member</h3>
+            <form onsubmit="submitEdit(event)">
+                <label>Name:</label>
+                <input type="text" id="editName" value="${name}" required>
+                <label>Gender:</label>
+                <select id="editGender">
+                    <option value="Male" ${gender === 'Male' ? 'selected' : ''}>Male</option>
+                    <option value="Female" ${gender === 'Female' ? 'selected' : ''}>Female</option>
+                    <option value="Other" ${gender === 'Other' ? 'selected' : ''}>Other</option>
+                </select>
+                <label>Date of Birth:</label>
+                <input type="date" id="editDOB" value="${dob}" required>
+                <label>Membership Type:</label>
+                <input type="text" id="editMembership" value="${membership}" required>
+                <label>Status:</label>
+                <select id="editStatus">
+                    <option value="Active" ${status === 'Active' ? 'selected' : ''}>Active</option>
+                    <option value="Inactive" ${status === 'Inactive' ? 'selected' : ''}>Inactive</option>
+                </select>
+                <label>Joined Date:</label>
+                <input type="date" id="editJoined" value="${joined}">
+                <label>Email:</label>
+                <input type="email" id="editEmail" value="${email}">
+                <label>Phone:</label>
+                <input type="text" id="editPhone" value="${phone}">
+                <label>Address:</label>
+                <input type="text" id="editAddress" value="${address}">
+                <button type="submit" class="save-btn">Save Changes</button>
+            </form>
+        `;
+        showModal(html);
+    }
+
+    function submitEdit(event) {
+        event.preventDefault();
+        alert("Changes saved (not connected to DB).");
+        closeModal();
+    }
+
+    let rowToDelete = null;
+    function openDeleteModal(button) {
+        rowToDelete = button.closest("tr");
+        const html = `
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h3>Confirm Deletion</h3>
+            <p>Are you sure you want to delete this member?</p>
+            <button class="delete2-button" onclick="confirmDelete()">Yes, Delete</button>
+            <button class="cancel-btn" onclick="closeModal()">Cancel</button>
+        `;
+        showModal(html);
+    }
+
+    function confirmDelete() {
+        if (rowToDelete) {
+            rowToDelete.remove();
+            alert("Member Deleted");
+
+            const tbody = document.getElementById("memberTableBody");
+            const hasMembers = Array.from(tbody.children).some(row => !row.classList.contains('no-members-row'));
+
+            if (!hasMembers) {
+                const noMembersRow = document.createElement("tr");
+                noMembersRow.className = "no-members-row";
+                noMembersRow.innerHTML = `<td colspan="6" style="text-align: center; padding: 1rem; color: gray;">No members available.</td>`;
+                tbody.appendChild(noMembersRow);
+            }
         }
-       
-        
-    </style>
+        closeModal();
+    }
 
-</head>
-<body>
-        <div class="members_container">
-            <div class="report">
-                <div class="details">
-                    <h1>Code from here</h1>
-                </div>
-            </div>
-         
-</body>
-</html>
+    document.querySelector(".add-btn").addEventListener("click", () => {
+        document.getElementById("addModal").style.display = "block";
+    });
 
-{%endblock%}
+    function closeAddModal() {
+        document.getElementById("addModal").style.display = "none";
+    }
+
+    document.getElementById("addForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const name = document.getElementById("addName").value;
+        const gender = document.getElementById("addGender").value;
+        const dob = document.getElementById("addDOB").value;
+        const membership = document.getElementById("addMembership").value;
+        const status = document.getElementById("addStatus").value;
+        const joined = document.getElementById("addJoined").value;
+        const email = document.getElementById("addEmail").value;
+        const phone = document.getElementById("addPhone").value;
+        const address = document.getElementById("addAddress").value;
+
+        const tbody = document.getElementById("memberTableBody");
+        const noMembersRow = document.querySelector(".no-members-row");
+        if (noMembersRow) noMembersRow.remove();
+
+        const newRow = document.createElement("tr");
+        newRow.className = "table-row";
+        newRow.innerHTML = `
+            <td>AutoID</td>
+            <td>${name}</td>
+            <td>${membership}</td>
+            <td><span class="${status.toLowerCase()}">${status}</span></td>
+            <td>${joined}</td>
+            <td>
+                <button class="edit-button" onclick="openEditModal('${name}', '${gender}', '${dob}', '${membership}', '${status}', '${joined}', '${email}', '${phone}', '${address}')">Edit</button>
+                <button class="view-button" onclick="openViewModal('${name}', '${gender}', '${dob}', '${membership}', '${status}', '${joined}', '${email}', '${phone}', '${address}')">View</button>
+                <button class="delete-button" onclick="openDeleteModal(this)">Delete</button>
+            </td>
+        `;
+        tbody.appendChild(newRow);
+
+        closeAddModal();
+        alert("New member added.");
+    });
+</script>
+
+<style>
+    /* Your existing CSS remains unchanged here */
+    .member-section {
+        margin-left: 300px;
+        width: 95%;
+        margin-top: -500px;
+    }
+    .table-container { width: 80%; }
+    .add-btn { margin-bottom: 5px; }
+    .table-row { border-width: 1px; border-color: rgb(192, 192, 192); }
+    .table-head {
+        background-color: rgb(48, 47, 47);
+        color: white;
+        border-radius: 4px;
+        border-width: 1px dashed black;
+        padding: 4px;
+    }
+    .edit-button, .view-button, .delete-button {
+        border: none;
+        width: 30%;
+        border-radius: 4px;
+        color: white;
+        font-weight: bold;
+    }
+    .edit-button { background-color: rgb(82, 231, 82); }
+    .view-button { background-color: #ffcc00; margin-left: 5px; }
+    .delete-button { background-color: #ee1616; margin-left: 5px; }
+    td { padding: 5px; background-color: rgb(231, 231, 231); }
+    th { padding: 5px; }
+    table { border-collapse: collapse; }
+
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.5);
+    }
+
+    .modal-content {
+        background-color: #fff;
+        margin: 10% auto;
+        padding: 2rem;
+        border-radius: 10px;
+        width: 90%;
+        max-width: 500px;
+        position: relative;
+    }
+
+    .close-btn {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 24px;
+        cursor: pointer;
+        color: #888;
+    }
+
+    .close-btn:hover { color: black; }
+
+    form input, form select {
+        width: 100%;
+        padding: 0.5rem;
+        margin-bottom: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    .save-btn {
+        background-color: #28a745;
+        color: white;
+        padding: 0.5rem 1.2rem;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .cancel-btn, .delete2-button {
+        margin-top: 10px;
+        color: white;
+        font-weight: bold;
+        border: none;
+        border-radius: 4px;
+    }
+
+    .cancel-btn { background-color: #42b866; }
+    .delete2-button { background-color: #ee1616; }
+</style>
+{% endblock %}
+

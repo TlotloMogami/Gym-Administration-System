@@ -1,12 +1,12 @@
-{%extends 'basetemplate.html'%}
+{% extends 'base.html' %}
 
-{%block search_bar%}
+{% block search_bar %}
 <div class="search">
     <input type="search" class="search-bar" placeholder="Search for {{page_title}}">
 </div>
-{%endblock%}
+{% endblock %}
 
-{%block content%}
+{% block content %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,27 +15,347 @@
     <title>{{page_title}}</title>
 
     <style>
-        .members_container{
+        h1 {
             margin-left: auto;
             width: 82%;
             margin-top: -500px;
-            height: 88vh;    
-            display: block;
         }
-       
-        
-    </style>
 
+        .instructor-section {
+            margin-left: 300px;
+            width: 95%;
+            margin-top: -500px;
+        }
+
+        .table-container {
+            width: 80%;
+        }
+
+        .add-btn {
+            margin-bottom: 5px;
+        }
+
+        .table-row {
+            border-width: 1px;
+            border-color: rgb(192, 192, 192);
+        }
+
+        .table-head {
+            background-color: rgb(48, 47, 47);
+            color: white;
+            border-radius: 4px;
+            border-width: 1px dashed black;
+            padding: 4px;
+        }
+
+        .edit-button, .view-button, .delete-button {
+            width: 30%;
+            border-radius: 4px;
+            font-weight: bold;
+            color: white;
+            border: none;
+        }
+
+        .edit-button { background-color: rgb(82, 231, 82); }
+        .view-button { background-color: #ffcc00; margin-left: 5px; }
+        .delete-button { background-color: #ee1616; margin-left: 5px; }
+
+        td { padding: 5px; background-color: rgb(231, 231, 231); }
+        th { padding: 5px; }
+        table { border-collapse: collapse; }
+
+        .modal {
+            display: none; 
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #888;
+        }
+
+        .close-btn:hover { color: black; }
+
+        form input, form select {
+            width: 100%;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .save-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 0.5rem 1.2rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .cancel-btn {
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
-        <div class="members_container">
-            <div class="report">
-                <div class="details">
-                    <h1>Code from here</h1>
-                </div>
+    <div class="instructor-section">
+        <h2>Trainer Management</h2>
+
+        <button class="add-btn">+ Add Instructor</button>
+
+        <div class="table-wrapper">
+            <div class="table-container">
+                <table width="90%">
+                    <thead class="table-head">
+                        <tr>
+                            <th>Photo</th>
+                            <th>Name</th>
+                            <th>Specialization</th>
+                            <th>Status</th>
+                            <th>Hired</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="instructorTableBody">
+                        <tr class="no-members-row">
+                            <td colspan="6" style="text-align: center; padding: 1rem; color: gray;">No trainers available.</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-         
+        </div>
+    </div>
+
+    <!-- Add Modal -->
+    <div id="addModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeAddModal()">&times;</span>
+            <h3>Add New Instructor</h3>
+            <form id="addForm">
+                <label>Name:</label>
+                <input type="text" id="addName" required>
+
+                <label>Specialization:</label>
+                <input type="text" id="addSpecialization" required>
+
+                <label>Status:</label>
+                <select id="addStatus">
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                </select>
+
+                <label>Hired Date:</label>
+                <input type="date" id="addHired" required>
+
+                <label>Email:</label>
+                <input type="email" id="addEmail" required>
+
+                <label>Phone:</label>
+                <input type="text" id="addPhone" required>
+
+                <button type="submit" class="save-btn">Add Trainer</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- View Modal -->
+    <div id="viewModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h3>Instructor Details</h3>
+            <p><strong>Name:</strong> <span id="modalName"></span></p>
+            <p><strong>Specialization:</strong> <span id="modalSpecialization"></span></p>
+            <p><strong>Status:</strong> <span id="modalStatus"></span></p>
+            <p><strong>Hired:</strong> <span id="modalHired"></span></p>
+            <p><strong>Email:</strong> <span id="modalEmail"></span></p>
+            <p><strong>Phone:</strong> <span id="modalPhone"></span></p>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeEditModal()">&times;</span>
+            <h3>Edit Instructor</h3>
+            <form id="editForm">
+                <label>Name:</label>
+                <input type="text" id="editName" required>
+
+                <label>Specialization:</label>
+                <input type="text" id="editSpecialization" required>
+
+                <label>Status:</label>
+                <select id="editStatus">
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                </select>
+
+                <label>Hired Date:</label>
+                <input type="date" id="editHired">
+
+                <label>Email:</label>
+                <input type="email" id="editEmail">
+
+                <label>Phone:</label>
+                <input type="text" id="editPhone">
+
+                <button type="submit" class="save-btn">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeDeleteModal()">&times;</span>
+            <h3>Confirm Deletion</h3>
+            <p>Are you sure you want to delete this instructor?</p>
+            <button class="delete2-button" onclick="confirmDelete()">Yes, Delete</button>
+            <button class="cancel-btn" onclick="closeDeleteModal()">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        function openModal(name, specialization, status, hired, email, phone) {
+            document.getElementById('modalName').textContent = name;
+            document.getElementById('modalSpecialization').textContent = specialization;
+            document.getElementById('modalStatus').textContent = status;
+            document.getElementById('modalHired').textContent = hired;
+            document.getElementById('modalEmail').textContent = email;
+            document.getElementById('modalPhone').textContent = phone;
+            document.getElementById('viewModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('viewModal').style.display = 'none';
+        }
+
+        function openEditModal(name, specialization, status, hired, email, phone) {
+            document.getElementById('editName').value = name;
+            document.getElementById('editSpecialization').value = specialization;
+            document.getElementById('editStatus').value = status;
+            document.getElementById('editHired').value = hired;
+            document.getElementById('editEmail').value = email;
+            document.getElementById('editPhone').value = phone;
+            document.getElementById('editModal').style.display = 'block';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        document.getElementById('editForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Instructor changes saved.');
+            closeEditModal();
+        });
+
+        document.querySelector('.add-btn').addEventListener('click', function() {
+            document.getElementById('addModal').style.display = 'block';
+        });
+
+        function closeAddModal() {
+            document.getElementById('addModal').style.display = 'none';
+        }
+
+        document.getElementById('addForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('addName').value;
+            const specialization = document.getElementById('addSpecialization').value;
+            const status = document.getElementById('addStatus').value;
+            const hired = document.getElementById('addHired').value;
+            const email = document.getElementById('addEmail').value;
+            const phone = document.getElementById('addPhone').value;
+
+            const tbody = document.getElementById('instructorTableBody');
+            const newRow = document.createElement('tr');
+            newRow.className = 'table-row';
+            newRow.innerHTML = `
+                <td><img src="img/default-avatar.png" alt="Instructor" class="avatar"></td>
+                <td>${name}</td>
+                <td>${specialization}</td>
+                <td><span class="${status.toLowerCase()}">${status}</span></td>
+                <td>${hired}</td>
+                <td>
+                    <button class="edit-button" onclick="openEditModal('${name}', '${specialization}', '${status}', '${hired}', '${email}', '${phone}')">Edit</button>
+                    <button class="view-button" onclick="openModal('${name}', '${specialization}', '${status}', '${hired}', '${email}', '${phone}')">View</button>
+                    <button class="delete-button" onclick="openDeleteModal(this)">Delete</button>
+                </td>
+            `;
+            tbody.appendChild(newRow);
+            closeAddModal();
+            alert('New instructor added.');
+
+            checkEmptyTable();
+        });
+
+        let rowToDelete = null;
+
+        function openDeleteModal(button) {
+            rowToDelete = button.closest('tr');
+            document.getElementById('deleteModal').style.display = 'block';
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+            rowToDelete = null;
+        }
+
+        function confirmDelete() {
+            if (rowToDelete) {
+                rowToDelete.remove();
+                alert('Instructor deleted.');
+                checkEmptyTable();
+            }
+            closeDeleteModal();
+        }
+
+        function checkEmptyTable() {
+            const tbody = document.getElementById('instructorTableBody');
+            const dataRows = tbody.querySelectorAll('tr:not(.no-members-row)');
+            const noMembersRow = tbody.querySelector('.no-members-row');
+
+            if (dataRows.length === 0) {
+                if (noMembersRow) noMembersRow.style.display = '';
+            } else {
+                if (noMembersRow) noMembersRow.style.display = 'none';
+            }
+        }
+
+        window.onclick = function(event) {
+            ['viewModal', 'editModal', 'addModal', 'deleteModal'].forEach(id => {
+                const modal = document.getElementById(id);
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        };
+
+        // Initial check
+        checkEmptyTable();
+    </script>
 </body>
 </html>
-
-{%endblock%}
+{% endblock %}

@@ -1,41 +1,102 @@
-{%extends 'basetemplate.html'%}
+{% extends 'base.html' %}
 
-{%block search_bar%}
-<div class="search">
-    <input type="search" class="search-bar" placeholder="Search for {{page_title}}">
+{% block content %}
+<div class="charts-wrapper">
+    <div class="chart-section">
+        <h2>Subscription Type Distribution</h2>
+        <canvas id="subscriptionChart" width="400" height="250"></canvas>
+    </div>
+
+    <div class="chart-section2">
+        <h2>Popular Classes</h2>
+        <canvas class="popular" id="popularClassesChart" width="400" height="200"></canvas>
+    </div>
 </div>
-{%endblock%}
 
-{%block content%}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{page_title}}</title>
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <style>
-        .members_container{
-            margin-left: auto;
-            width: 82%;
-            margin-top: -500px;
-            height: 88vh;    
-            display: block;
+<script>
+    // Heads up..... populated with dummy data, should be intergrated with the database
+    // Subscription Type Chart
+    const ctx1 = document.getElementById('subscriptionChart').getContext('2d');
+    new Chart(ctx1, {
+        type: 'bar',
+        data: {
+            labels: ['Basic', 'Premium'],
+            datasets: [{
+                label: 'Number of Subscriptions',
+                data: [45, 30],
+                backgroundColor: ['#3498db', '#2ecc71'],
+                borderColor: ['#2980b9', '#27ae60'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 5 }
+                }
+            }
         }
-       
-        
-    </style>
+    });
 
-</head>
-<body>
-        <div class="members_container">
-            <div class="report">
-                <div class="details">
-                    <h1>Code from here</h1>
-                </div>
-            </div>
-         
-</body>
-</html>
+    // Popular Classes Chart
+    const ctx2 = document.getElementById('popularClassesChart').getContext('2d');
+    new Chart(ctx2, {
+        type: 'doughnut',
+        data: {
+            labels: ['Yoga', 'Zumba', 'Pilates', 'Weight Training', 'CrossFit'],
+            datasets: [{
+                label: 'Members Enrolled',
+                data: [20, 35, 15, 25, 10],
+                backgroundColor: [
+                    '#f1c40f',
+                    '#e67e22',
+                    '#9b59b6',
+                    '#1abc9c',
+                    '#34495e'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+</script>
 
-{%endblock%}
+<style>
+    .charts-wrapper {
+        display: flex;
+        justify-content: space-between;
+        margin-left: 300px;
+        margin-top: -500px;
+        width: 65%;
+        gap: 2rem;
+    }
+    .chart-section2,
+    .chart-section {
+        flex: 1;
+        background: #fff;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        height: 370px;
+    }
+
+    .popular{
+        margin-top: -15px;
+    }
+
+    canvas {
+        max-width: 100%;
+    }
+</style>
+{% endblock %}

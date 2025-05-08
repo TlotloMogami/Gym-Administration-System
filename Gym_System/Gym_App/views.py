@@ -4,7 +4,7 @@ def loginPage(request):
     return render(request, 'loginPage.html')
 
 def dashboard(request):
-    return render(request, 'basetemplate.html' , {'page_title':'dashboard'})
+    return render(request, 'base.html' , {'page_title':'dashboard'})
 
 def members(request):
     return render(request, 'members.html' ,{'page_title':'members'})
@@ -12,8 +12,8 @@ def members(request):
 def trainers(request):
     return render(request, 'trainers.html' ,{'page_title':'trainers'})
 
-def instructors(request):
-    return render(request, 'instructors.html' ,{'page_title':'instructors'})
+def payments(request):
+    return render(request, 'payments.html' ,{'page_title':'payments'})
 
 def general_employees(request):
     return render(request, 'general_employees.html' ,{'page_title':'general_Employees'})
