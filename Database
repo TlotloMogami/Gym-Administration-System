@@ -46,7 +46,6 @@ CREATE TABLE FitnessProgramme (
     Name VARCHAR(100)
 );
 
--- Insert sample Fitness Programmes
 INSERT INTO FitnessProgramme (ProgrameID, MemberID, TrainerID, Name) VALUES
 (401101, 100101, 701101, 'Weight Loss'),
 (401102, 100102, 701102, 'Strength Training'),
