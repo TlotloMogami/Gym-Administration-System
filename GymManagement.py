@@ -143,8 +143,8 @@ CREATE TABLE Member (
 );
 
 INSERT INTO Member (MemberID, MembershipID, PaymentID, ProgrameID, AdminID, FullName, Age, PhoneNumber, RegistrationDate, Address) VALUES
-(100101, 201101, 301101, 401101, 501101, 'Kagiso Lesetla', 22, '0792267465', '2024-01-15', '101 University Drive'),
-(100102, 201102, 301102, 401102, 501102, 'Marvin Nkosi', 23, '0735647893', '2024-02-12', '102 Sekame St'),
-(100103, 201103, 301103, 401103, 501103, 'Carol Baloyi', 26, '0797774563', '2024-03-01', '103 Provident St'),
-(100104, 201104, 301104, 401104, 501101, 'David Ntshing', 18, '0658735573', '2024-03-10', '104 Bothlaping St'),
-(100105, 201105, 301105, 401105, 501102, 'Eva Manganyi', 19, '0836574528', '2024-03-15', '105 Mmabatho');
+(100101, 201101, 301101, 401101, 501101, 'Kagiso Lesetla', 22, '0792267465', '2024-01-15', '2745 University Drive'),
+(100102, 201102, 301102, 401102, 501102, 'Marvin Nkosi', 23, '0735647893', '2024-02-12', '2745 Sekame St'),
+(100103, 201103, 301103, 401103, 501103, 'Carol Baloyi', 26, '0797774563', '2024-03-01', '2745 Provident St'),
+(100104, 201104, 301104, 401104, 501101, 'David Ntshing', 18, '0658735573', '2024-03-10', '2745 Bothlaping St'),
+(100105, 201105, 301105, 401105, 501102, 'Eva Manganyi', 19, '0836574528', '2024-03-15', '2745 Mmabatho');
