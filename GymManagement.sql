@@ -35,9 +35,9 @@ CREATE TABLE Trainer (
 );
 
 INSERT INTO Trainer (TrainerID, ProgrameID, FullName, Email, Address, PhoneNumber) VALUES
-(701101, 401101, 'Easy Manyike', '701101@mynwu.ac.za', '2790 Mmabatho St', '0839644738'),
-(701102, 401102, 'Lornel Kubayi', '701102@mynwu.ac.za', '2790 Mmabatho St', '0736893657'),
-(701103, 401103, 'Tshikani Masete', '701103@mynwu.ac.za', '2790 Mmabatho St', '0658367463');
+(701101, 401101, 'Easy Manyike', '701101@mynwu.ac.za', '2790 Mmabatho', '0839644738'),
+(701102, 401102, 'Lornel Kubayi', '701102@mynwu.ac.za', '2750 Bokone', '0736893657'),
+(701103, 401103, 'Tshikani Masete', '701103@mynwu.ac.za', '2763 Signal Hill', '0658367463');
 
 CREATE TABLE FitnessProgramme (
     ProgrameID INT PRIMARY KEY,
@@ -46,6 +46,7 @@ CREATE TABLE FitnessProgramme (
     Name VARCHAR(100)
 );
 
+-- Insert sample Fitness Programmes
 INSERT INTO FitnessProgramme (ProgrameID, MemberID, TrainerID, Name) VALUES
 (401101, 100101, 701101, 'Weight Loss'),
 (401102, 100102, 701102, 'Strength Training'),
@@ -144,7 +145,22 @@ CREATE TABLE Member (
 
 INSERT INTO Member (MemberID, MembershipID, PaymentID, ProgrameID, AdminID, FullName, Age, PhoneNumber, RegistrationDate, Address) VALUES
 (100101, 201101, 301101, 401101, 501101, 'Kagiso Lesetla', 22, '0792267465', '2024-01-15', '2745 University Drive'),
-(100102, 201102, 301102, 401102, 501102, 'Marvin Nkosi', 23, '0735647893', '2024-02-12', '2745 Sekame St'),
-(100103, 201103, 301103, 401103, 501103, 'Carol Baloyi', 26, '0797774563', '2024-03-01', '2745 Provident St'),
-(100104, 201104, 301104, 401104, 501101, 'David Ntshing', 18, '0658735573', '2024-03-10', '2745 Bothlaping St'),
-(100105, 201105, 301105, 401105, 501102, 'Eva Manganyi', 19, '0836574528', '2024-03-15', '2745 Mmabatho');
+(100102, 201102, 301102, 401102, 501102, 'Marvin Nkosi', 23, '0735647893', '2024-02-12', '2752 Sekame St'),
+(100103, 201103, 301103, 401103, 501103, 'Carol Baloyi', 26, '0797774563', '2024-03-01', '2767 Provident St'),
+(100104, 201104, 301104, 401104, 501101, 'David Ntshing', 18, '0658735573', '2024-03-10', '2783 Bothlaping St'),
+(100105, 201105, 301105, 401105, 501102, 'Eva Manganyi', 19, '0836574528', '2024-03-15', '2858 Mmabatho'),
+(100106, 200106, 300106, 401106, 501103, 'Precious Mkharhi', 18, '0725678356', '2024-01-06', '2738 Rivera Park'),
+(100107, 200107, 300107, 401107, 501101, 'Princess Meyer', 29, '0667456365', '2024-01-07', '2749 Golf View'),
+(100108, 200108, 300108, 401108, 501102, 'Angel Valoi', 27, '0735674683', '2024-01-08', '2753 Lonely Park'),
+(100109, 200109, 300109, 401109, 501103, 'Blessing Maladji', 25, '0824536746', '2024-01-09', '2768 Montlabeng'),
+(100110, 200110, 300110, 401110, 501101, 'Koketso Mhlarhi', 21, '0631084756', '2024-01-10', '2784 Seweding'),
+(100111, 200111, 300111, 401111, 501102, 'Junior Khoza', 25, '0661019786', '2024-01-11', '2866 Tloung'),
+(100112, 200112, 300112, 401112, 501103, 'Mbuyelo Rikhotso', 29, '0725468354', '2024-01-12', '2744 Magogoe'),
+(100113, 200113, 300113, 401113, 501101, 'Faith Ntshani', 22, '0662678465', '2024-01-13', '2750 Bokene'),
+(100114, 200114, 300114, 401114, 501102, 'Hope Shai', 24, '0816625647', '2024-01-14', '2763 Signal Hill'),
+(100115, 200115, 300115, 401115, 501103, 'Phillip Hlatswayo', 28, '0763046857', '2024-01-15', '2769 Dibate'),
+(100116, 200116, 300116, 401116, 501101, 'Paul Ngobeni', 25, '0745385746', '2024-01-16', '2855 Danvile'),
+(100117, 200117, 300117, 401117, 501102, 'Ofentse Kgosi', 27, '0724652579', '2024-01-17', '2751 Taung'),
+(100118, 200118, 300118, 401118, 501103, 'Pholosho Phaahla', 21, '0817238957', '2024-01-18', '2766 Namakgale'),
+(100119, 200119, 300119, 401119, 501101, 'Sharmaine Abrahamms', 19, '0785935786', '2024-01-19', '2782 Majeje'),
+(100120, 200120, 300120, 401120, 501102, 'Sternan Van Niekerk ', 24, '0764148856', '2024-01-20', '2857 Thapang');
