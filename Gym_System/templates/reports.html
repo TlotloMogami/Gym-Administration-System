@@ -4,72 +4,79 @@
 <div class="charts-wrapper">
     <div class="chart-section">
         <h2>Subscription Type Distribution</h2>
-        <canvas id="subscriptionChart" width="400" height="250"></canvas>
+        <div class="chart-container">
+            <canvas id="subscriptionChart"></canvas>
+        </div>
     </div>
 
     <div class="chart-section2">
-        <h2>Popular Classes</h2>
-        <canvas class="popular" id="popularClassesChart" width="400" height="200"></canvas>
+        <h2>Popular Fitness Programs</h2>
+        <div class="chart-container">
+            <canvas id="popularClassesChart"></canvas>
+        </div>
     </div>
 </div>
 
-<!-- Chart.js CDN -->
+<!-- ✅ Chart.js must come BEFORE any code that uses it -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+<!-- ✅ Your custom chart script -->
 <script>
-    // Heads up..... populated with dummy data, should be intergrated with the database
-    // Subscription Type Chart
-    const ctx1 = document.getElementById('subscriptionChart').getContext('2d');
-    new Chart(ctx1, {
-        type: 'bar',
-        data: {
-            labels: ['Basic', 'Premium'],
-            datasets: [{
-                label: 'Number of Subscriptions',
-                data: [45, 30],
-                backgroundColor: ['#3498db', '#2ecc71'],
-                borderColor: ['#2980b9', '#27ae60'],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: { stepSize: 5 }
-                }
-            }
-        }
-    });
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('/reports_api/reports/')
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP status ${response.status}`);
+            return response.json();
+        })
+        .then(result => {
+            console.log("Chart data:", result);
 
-    // Popular Classes Chart
-    const ctx2 = document.getElementById('popularClassesChart').getContext('2d');
-    new Chart(ctx2, {
-        type: 'doughnut',
-        data: {
-            labels: ['Yoga', 'Zumba', 'Pilates', 'Weight Training', 'CrossFit'],
-            datasets: [{
-                label: 'Members Enrolled',
-                data: [20, 35, 15, 25, 10],
-                backgroundColor: [
-                    '#f1c40f',
-                    '#e67e22',
-                    '#9b59b6',
-                    '#1abc9c',
-                    '#34495e'
-                ]
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'bottom'
+            // Chart 1: Membership Types
+            const ctx = document.getElementById('subscriptionChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: result.labels,
+                    datasets: [{
+                        label: 'Subscriptions',
+                        data: result.data,
+                        backgroundColor: ['#3498db', '#2ecc71'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: { y: { beginAtZero: true } }
                 }
-            }
-        }
-    });
+            });
+
+            // ✅ Chart 2: Popular Classes (Dynamic)
+            const ctx2 = document.getElementById('popularClassesChart').getContext('2d');
+            new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: result.class_labels,
+                    datasets: [{
+                        label: 'Members Enrolled',
+                        data: result.class_data,
+                        backgroundColor: [
+                            '#f1c40f', '#e67e22', '#9b59b6', '#1abc9c', '#34495e'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+
+        })
+        .catch(error => {
+            console.error('Error loading chart data:', error);
+            document.querySelector('.charts-wrapper').innerHTML += 
+                `<p class="error">Error loading chart data: ${error.message}</p>`;
+        });
+});
 </script>
 
 <style>
@@ -81,22 +88,21 @@
         width: 65%;
         gap: 2rem;
     }
-    .chart-section2,
-    .chart-section {
+    .chart-section, .chart-section2 {
         flex: 1;
         background: #fff;
-        padding: 2rem;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        height: 370px;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-
-    .popular{
-        margin-top: -15px;
+    .chart-container {
+        position: relative;
+        height: 300px;
+        width: 100%;
     }
-
-    canvas {
-        max-width: 100%;
+    .error {
+        color: red;
+        margin-top: 10px;
     }
 </style>
 {% endblock %}
