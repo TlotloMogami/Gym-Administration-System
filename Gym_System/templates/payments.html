@@ -2,58 +2,116 @@
 
 {% block content %}
 <div class="payment-section">
-    <h2>Make a Subscription Payment</h2>
+    <h2>Activate Member Subscription</h2>
+    <div class="payment-status" id="paymentStatus"></div>
 
     <form id="paymentForm" class="payment-form">
+        {% csrf_token %}
+        
         <div class="form-group">
             <label for="memberId">Member ID</label>
             <input type="text" id="memberId" name="memberId" required>
+            <small class="form-text text-muted">Enter the member's ID number</small>
         </div>
 
         <div class="form-group">
             <label for="subscriptionType">Subscription Type</label>
             <select id="subscriptionType" name="subscriptionType" required>
-                <option value="">Select</option>
-                <option value="Basic">Basic</option>
-                <option value="Premium">Premium</option>
+                <option value="">Select subscription</option>
+                <option value="Basic">Basic (R100/month)</option>
+                <option value="Premium">Premium (R200/month)</option>
             </select>
         </div>
 
         <div class="form-group">
             <label for="amount">Amount (ZAR)</label>
             <input type="number" id="amount" name="amount" min="0" step="0.01" required>
+            <small class="form-text text-muted">Enter the payment amount</small>
         </div>
 
         <div class="form-group">
             <label for="paymentMethod">Payment Method</label>
             <select id="paymentMethod" name="paymentMethod" required>
-                <option value="">Select</option>
-                <option value="Card">Card</option>
-                <option value="Bank Transfer">Bank Transfer</option>
+                <option value="">Select method</option>
+                <option value="Card">Credit/Debit Card</option>
+                <option value="EFT">Bank Transfer (EFT)</option>
                 <option value="Cash">Cash</option>
             </select>
         </div>
 
-        <button type="submit" class="submit-btn">Submit Payment</button>
+        <button type="submit" class="submit-btn">Process Payment</button>
     </form>
 </div>
 
 <script>
-    document.getElementById('paymentForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        // TODO: Send to backend (AJAX or form POST)
-        alert('Payment submitted successfully!');
-        this.reset();
+document.getElementById('paymentForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const statusDiv = document.getElementById('paymentStatus');
+    statusDiv.innerHTML = '<div class="alert alert-info">Processing payment...</div>';
+    
+    const formData = {
+        memberId: document.getElementById('memberId').value,
+        subscriptionType: document.getElementById('subscriptionType').value,
+        amount: document.getElementById('amount').value,
+        paymentMethod: document.getElementById('paymentMethod').value,
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+    };
+
+    fetch('{% url "process_payment" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            statusDiv.innerHTML = `<div class="alert alert-success">
+                Payment successful! Member is now active with ${data.membership_type} membership.
+            </div>`;
+            // Optionally redirect or refresh member list
+            setTimeout(() => window.location.href = '{% url "members" %}', 2000);
+        } else {
+            statusDiv.innerHTML = `<div class="alert alert-danger">Error: ${data.message}</div>`;
+        }
+    })
+    .catch(error => {
+        statusDiv.innerHTML = `<div class="alert alert-danger">Payment failed: ${error.message}</div>`;
     });
+});
 </script>
 
 <style>
+.payment-status {
+    margin-bottom: 20px;
+}
+.alert {
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    width : 400px;
+}
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+}
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+.alert-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+/* Your existing styles... */
+
     .payment-section {
         margin-left: 480px;
         width: 95%;
         margin-top: -520px;
     }
-
     .payment-form {
         background: #fff;
         padding: 2rem;
@@ -61,24 +119,20 @@
         box-shadow: 0 0 10px rgba(0,0,0,0.1);
         max-width: 400px;
     }
-
     .form-group {
         margin-bottom: 1rem;
     }
-
     label {
         display: block;
         margin-bottom: 0.3rem;
         font-weight: bold;
     }
-
     input, select {
         width: 100%;
         padding: 0.6rem;
         border: 1px solid #ccc;
         border-radius: 4px;
     }
-
     .submit-btn {
         padding: 0.7rem 1.5rem;
         background: #4CAF50;
@@ -87,7 +141,6 @@
         border-radius: 4px;
         cursor: pointer;
     }
-
     .submit-btn:hover {
         background: #45a049;
     }
