@@ -65,6 +65,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                'django.template.context_processors.csrf',
             ],
         },
     },
@@ -124,3 +125,14 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+LOGIN_URL = ''           # Redirects users here if they're not logged in
+LOGIN_REDIRECT_URL = '/dashboard'        # Optional: where to go after successful login
+LOGOUT_REDIRECT_URL = '/login'  
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://localhost:8000',  # for HTTPS
+    'http://localhost:8000',   # for HTTP
+]
+
+CSRF_COOKIE_SECURE = False  # Disabl
