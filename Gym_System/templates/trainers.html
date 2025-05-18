@@ -2,360 +2,326 @@
 
 {% block search_bar %}
 <div class="search">
-    <input type="search" class="search-bar" placeholder="Search for {{page_title}}">
+    <input type="search" class="search-bar" placeholder="Search for Trainers">
 </div>
 {% endblock %}
 
 {% block content %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{page_title}}</title>
+<div class="trainer-section">
+    <h2>Trainer Management</h2>
 
-    <style>
-        h1 {
-            margin-left: auto;
-            width: 82%;
-            margin-top: -500px;
-        }
+    <button class="add-btn" onclick="openAddModal()">+ Add Trainer</button>
 
-        .instructor-section {
-            margin-left: 300px;
-            width: 95%;
-            margin-top: -500px;
-        }
+    <div class="table-wrapper">
+        <div class="table-container">
+            <table width="100%">
+                <thead class="table-head">
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Specialization</th>
+                        <th>Status</th>
+                        <th>Hired</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="trainerTableBody">
+                    {% for trainer in trainers %}
+                    <tr class="table-row">
+                        <td>{{ trainer.id }}</td>
+                        <td>{{ trainer.name }}</td>
+                        <td>{{ trainer.fitness_programs }}</td>
+                        <td>{{ trainer.status }}</td>
+                        <td>{{ trainer.hired_date|date:"Y-m-d" }}</td>
+                        <td>
+                            <button class="edit-button" 
+                                onclick="openEditModal(
+                                    {{ trainer.id }}, 
+                                    '{{ trainer.name|escapejs }}', 
+                                    '{{ trainer.fitness_programs|escapejs }}', 
+                                    '{{ trainer.status|escapejs }}', 
+                                    '{{ trainer.hired_date|date:"Y-m-d" }}', 
+                                    '{{ trainer.email|escapejs }}', 
+                                    '{{ trainer.phone|escapejs }}')">Edit</button>
 
-        .table-container {
-            width: 80%;
-        }
+                            <button class="view-button" 
+                                onclick="openViewModal(
+                                    '{{ trainer.name|escapejs }}', 
+                                    '{{ trainer.fitness_programs|escapejs }}', 
+                                    '{{ trainer.status|escapejs }}', 
+                                    '{{ trainer.hired_date|date:"Y-m-d" }}', 
+                                    '{{ trainer.email|escapejs }}', 
+                                    '{{ trainer.phone|escapejs }}')">View</button>
 
-        .add-btn {
-            margin-bottom: 5px;
-        }
-
-        .table-row {
-            border-width: 1px;
-            border-color: rgb(192, 192, 192);
-        }
-
-        .table-head {
-            background-color: rgb(48, 47, 47);
-            color: white;
-            border-radius: 4px;
-            border-width: 1px dashed black;
-            padding: 4px;
-        }
-
-        .edit-button, .view-button, .delete-button {
-            width: 30%;
-            border-radius: 4px;
-            font-weight: bold;
-            color: white;
-            border: none;
-        }
-
-        .edit-button { background-color: rgb(82, 231, 82); }
-        .view-button { background-color: #ffcc00; margin-left: 5px; }
-        .delete-button { background-color: #ee1616; margin-left: 5px; }
-
-        td { padding: 5px; background-color: rgb(231, 231, 231); }
-        th { padding: 5px; }
-        table { border-collapse: collapse; }
-
-        .modal {
-            display: none; 
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.5);
-        }
-
-        .modal-content {
-            background-color: #fff;
-            margin: 10% auto;
-            padding: 2rem;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 500px;
-            position: relative;
-        }
-
-        .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            font-size: 24px;
-            cursor: pointer;
-            color: #888;
-        }
-
-        .close-btn:hover { color: black; }
-
-        form input, form select {
-            width: 100%;
-            padding: 0.5rem;
-            margin-bottom: 1rem;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        .save-btn {
-            background-color: #28a745;
-            color: white;
-            padding: 0.5rem 1.2rem;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .cancel-btn {
-            margin-top: 10px;
-        }
-    </style>
-</head>
-<body>
-    <div class="instructor-section">
-        <h2>Trainer Management</h2>
-
-        <button class="add-btn">+ Add Instructor</button>
-
-        <div class="table-wrapper">
-            <div class="table-container">
-                <table width="90%">
-                    <thead class="table-head">
-                        <tr>
-                            <th>Photo</th>
-                            <th>Name</th>
-                            <th>Specialization</th>
-                            <th>Status</th>
-                            <th>Hired</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="instructorTableBody">
-                        <tr class="no-members-row">
-                            <td colspan="6" style="text-align: center; padding: 1rem; color: gray;">No trainers available.</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                            <form action="{% url 'delete_trainer' trainer.id %}" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this trainer?');">
+                                {% csrf_token %}
+                                <button type="submit" class="delete-button">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr class="no-members-row">
+                        <td colspan="6" style="text-align: center; padding: 1rem; color: gray;">No trainers available.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
+</div>
 
-    <!-- Add Modal -->
-    <div id="addModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeAddModal()">&times;</span>
-            <h3>Add New Instructor</h3>
-            <form id="addForm">
-                <label>Name:</label>
-                <input type="text" id="addName" required>
+<!-- Add Modal -->
+<div id="addModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal('addModal')">&times;</span>
+        <h3>Add New Trainer</h3>
+        <form action="{% url 'add_trainer' %}" method="post">
+            {% csrf_token %}
+            <label>Name:</label>
+            <input type="text" name="name" required>
 
-                <label>Specialization:</label>
-                <input type="text" id="addSpecialization" required>
+            <label>Specialization:</label>
+            <select name="fitness_program" required>
+                <option value="None">Select Fitness Program</option>
+                <option value="Yoga">Yoga</option>
+                <option value="Zumba">Zumba</option>
+                <option value="Pilates">Pilates</option>
+                <option value="Weight Training">Weight Training</option>
+                <option value="CrossFit">CrossFit</option>
+            </select>
 
-                <label>Status:</label>
-                <select id="addStatus">
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                </select>
+            <label>Status:</label>
+            <select name="status">
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+            </select>
 
-                <label>Hired Date:</label>
-                <input type="date" id="addHired" required>
+            <label>Hired Date:</label>
+            <input type="date" name="hired_date" required>
 
-                <label>Email:</label>
-                <input type="email" id="addEmail" required>
+            <label>Email:</label>
+            <input type="email" name="email" required>
 
-                <label>Phone:</label>
-                <input type="text" id="addPhone" required>
+            <label>Phone:</label>
+            <input type="text" name="phone" required>
 
-                <button type="submit" class="save-btn">Add Trainer</button>
-            </form>
-        </div>
+            <button type="submit" class="save-btn">Add Trainer</button>
+        </form>
     </div>
+</div>
 
-    <!-- View Modal -->
-    <div id="viewModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal()">&times;</span>
-            <h3>Instructor Details</h3>
-            <p><strong>Name:</strong> <span id="modalName"></span></p>
-            <p><strong>Specialization:</strong> <span id="modalSpecialization"></span></p>
-            <p><strong>Status:</strong> <span id="modalStatus"></span></p>
-            <p><strong>Hired:</strong> <span id="modalHired"></span></p>
-            <p><strong>Email:</strong> <span id="modalEmail"></span></p>
-            <p><strong>Phone:</strong> <span id="modalPhone"></span></p>
-        </div>
+<!-- View Modal -->
+<div id="viewModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal('viewModal')">&times;</span>
+        <h3>Trainer Details</h3>
+        <p><strong>Name:</strong> <span id="modalName"></span></p>
+        <p><strong>Specialization:</strong> <span id="modalSpecialization"></span></p>
+        <p><strong>Status:</strong> <span id="modalStatus"></span></p>
+        <p><strong>Hired:</strong> <span id="modalHired"></span></p>
+        <p><strong>Email:</strong> <span id="modalEmail"></span></p>
+        <p><strong>Phone:</strong> <span id="modalPhone"></span></p>
     </div>
+</div>
 
-    <!-- Edit Modal -->
-    <div id="editModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeEditModal()">&times;</span>
-            <h3>Edit Instructor</h3>
-            <form id="editForm">
-                <label>Name:</label>
-                <input type="text" id="editName" required>
+<!-- Edit Modal (Fixed) -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal('editModal')">&times;</span>
+        <h3>Edit Trainer</h3>
+        <form id="editForm" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="id" id="editId">
 
-                <label>Specialization:</label>
-                <input type="text" id="editSpecialization" required>
+            <label>Name:</label>
+            <input type="text" name="name" id="editName" required>
 
-                <label>Status:</label>
-                <select id="editStatus">
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                </select>
+            <label>Specialization:</label>
+            <select name="fitness_program" id="editFitnessProgram" required>
+                <option value="Yoga">Yoga</option>
+                <option value="Zumba">Zumba</option>
+                <option value="Pilates">Pilates</option>
+                <option value="Weight Training">Weight Training</option>
+                <option value="CrossFit">CrossFit</option>
+            </select>
 
-                <label>Hired Date:</label>
-                <input type="date" id="editHired">
+            <label>Status:</label>
+            <select name="status" id="editStatus">
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+            </select>
 
-                <label>Email:</label>
-                <input type="email" id="editEmail">
+            <label>Hired Date:</label>
+            <input type="date" name="hired_date" id="editHired" required>
 
-                <label>Phone:</label>
-                <input type="text" id="editPhone">
+            <label>Email:</label>
+            <input type="email" name="email" id="editEmail" required>
 
-                <button type="submit" class="save-btn">Save Changes</button>
-            </form>
-        </div>
+            <label>Phone:</label>
+            <input type="text" name="phone" id="editPhone" required>
+
+            <button type="submit" class="save-btn">Save Changes</button>
+        </form>
     </div>
+</div>
 
-    <!-- Delete Confirmation Modal -->
-    <div id="deleteModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeDeleteModal()">&times;</span>
-            <h3>Confirm Deletion</h3>
-            <p>Are you sure you want to delete this instructor?</p>
-            <button class="delete2-button" onclick="confirmDelete()">Yes, Delete</button>
-            <button class="cancel-btn" onclick="closeDeleteModal()">Cancel</button>
-        </div>
-    </div>
+<style>
+    /* Your existing CSS styles remain unchanged */
+    .trainer-section {
+        margin-left: 300px;
+        width: 80%;
+        margin-top: -500px;
+    }
 
-    <script>
-        function openModal(name, specialization, status, hired, email, phone) {
-            document.getElementById('modalName').textContent = name;
-            document.getElementById('modalSpecialization').textContent = specialization;
-            document.getElementById('modalStatus').textContent = status;
-            document.getElementById('modalHired').textContent = hired;
-            document.getElementById('modalEmail').textContent = email;
-            document.getElementById('modalPhone').textContent = phone;
-            document.getElementById('viewModal').style.display = 'block';
-        }
+    .table-container {
+        width: 90%;
+    }
 
-        function closeModal() {
-            document.getElementById('viewModal').style.display = 'none';
-        }
+    .add-btn {
+        margin-bottom: 5px;
+       
+    }
+ 
 
-        function openEditModal(name, specialization, status, hired, email, phone) {
-            document.getElementById('editName').value = name;
-            document.getElementById('editSpecialization').value = specialization;
-            document.getElementById('editStatus').value = status;
-            document.getElementById('editHired').value = hired;
-            document.getElementById('editEmail').value = email;
-            document.getElementById('editPhone').value = phone;
-            document.getElementById('editModal').style.display = 'block';
-        }
+    .table-head {
+        background-color: rgb(48, 47, 47);
+        color: white;
+        border-radius: 4px;
+        border-width: 1px dashed black;
+        padding: 4px;
+    }
 
-        function closeEditModal() {
-            document.getElementById('editModal').style.display = 'none';
-        }
+    .edit-button, .view-button, .delete-button {
+        width: 30%;
+        border-radius: 4px;
+        font-weight: bold;
+        color: white;
+        border: none;
+        cursor: pointer;
+        padding: 0.3rem 0;
+    }
 
-        document.getElementById('editForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            alert('Instructor changes saved.');
-            closeEditModal();
-        });
+    .edit-button { background-color: rgb(82, 231, 82); }
+    .view-button { background-color: #ffcc00; margin-left: 5px; }
+    .delete-button { background-color: #ee1616; margin-left: 5px; text-decoration: none; display: inline-block; text-align: center; }
 
-        document.querySelector('.add-btn').addEventListener('click', function() {
-            document.getElementById('addModal').style.display = 'block';
-        });
+    td { padding: 5px; background-color: rgb(231, 231, 231); }
+    th { padding: 5px; }
+    table { border-collapse: collapse; width: 100%; }
 
-        function closeAddModal() {
-            document.getElementById('addModal').style.display = 'none';
-        }
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.5);
+    }
 
-        document.getElementById('addForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const name = document.getElementById('addName').value;
-            const specialization = document.getElementById('addSpecialization').value;
-            const status = document.getElementById('addStatus').value;
-            const hired = document.getElementById('addHired').value;
-            const email = document.getElementById('addEmail').value;
-            const phone = document.getElementById('addPhone').value;
+    .modal-content {
+        background-color: #fff;
+        margin: 10% auto;
+        padding: 2rem;
+        border-radius: 10px;
+        width: 90%;
+        max-width: 500px;
+        position: relative;
+    }
 
-            const tbody = document.getElementById('instructorTableBody');
-            const newRow = document.createElement('tr');
-            newRow.className = 'table-row';
-            newRow.innerHTML = `
-                <td><img src="img/default-avatar.png" alt="Instructor" class="avatar"></td>
-                <td>${name}</td>
-                <td>${specialization}</td>
-                <td><span class="${status.toLowerCase()}">${status}</span></td>
-                <td>${hired}</td>
-                <td>
-                    <button class="edit-button" onclick="openEditModal('${name}', '${specialization}', '${status}', '${hired}', '${email}', '${phone}')">Edit</button>
-                    <button class="view-button" onclick="openModal('${name}', '${specialization}', '${status}', '${hired}', '${email}', '${phone}')">View</button>
-                    <button class="delete-button" onclick="openDeleteModal(this)">Delete</button>
-                </td>
-            `;
-            tbody.appendChild(newRow);
-            closeAddModal();
-            alert('New instructor added.');
+    .close-btn {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 24px;
+        cursor: pointer;
+        color: #888;
+    }
 
-            checkEmptyTable();
-        });
+    .close-btn:hover { color: black; }
 
-        let rowToDelete = null;
+    form input, form select {
+        width: 100%;
+        padding: 0.5rem;
+        margin-bottom: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
 
-        function openDeleteModal(button) {
-            rowToDelete = button.closest('tr');
-            document.getElementById('deleteModal').style.display = 'block';
-        }
+    .save-btn {
+        background-color: #28a745;
+        color: white;
+        padding: 0.5rem 1.2rem;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 1rem;
+    }
+</style>
 
-        function closeDeleteModal() {
-            document.getElementById('deleteModal').style.display = 'none';
-            rowToDelete = null;
-        }
+<script>
+    // SEARCH FUNCTIONALITY
+    document.querySelector('.search-bar').addEventListener('input', function() {
+        const filter = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#trainerTableBody tr');
 
-        function confirmDelete() {
-            if (rowToDelete) {
-                rowToDelete.remove();
-                alert('Instructor deleted.');
-                checkEmptyTable();
-            }
-            closeDeleteModal();
-        }
-
-        function checkEmptyTable() {
-            const tbody = document.getElementById('instructorTableBody');
-            const dataRows = tbody.querySelectorAll('tr:not(.no-members-row)');
-            const noMembersRow = tbody.querySelector('.no-members-row');
-
-            if (dataRows.length === 0) {
-                if (noMembersRow) noMembersRow.style.display = '';
+        rows.forEach(row => {
+            const name = row.cells[1].textContent.toLowerCase();
+            const specialization = row.cells[2].textContent.toLowerCase();
+            const status = row.cells[3].textContent.toLowerCase();
+           
+            if (name.includes(filter) || specialization.includes(filter) || status.includes(filter)) {
+                row.style.display = '';
             } else {
-                if (noMembersRow) noMembersRow.style.display = 'none';
+                row.style.display = 'none';
             }
-        }
+        });
+    });
 
-        window.onclick = function(event) {
-            ['viewModal', 'editModal', 'addModal', 'deleteModal'].forEach(id => {
-                const modal = document.getElementById(id);
-                if (event.target === modal) {
-                    modal.style.display = 'none';
-                }
-            });
-        };
+    // MODAL FUNCTIONS
+    function openAddModal() {
+        document.getElementById('addModal').style.display = 'block';
+    }
 
-        // Initial check
-        checkEmptyTable();
-    </script>
-</body>
-</html>
+    function openViewModal(name, specialization, status, hired, email, phone) {
+        document.getElementById('modalName').textContent = name;
+        document.getElementById('modalSpecialization').textContent = specialization;
+        document.getElementById('modalStatus').textContent = status;
+        document.getElementById('modalHired').textContent = hired;
+        document.getElementById('modalEmail').textContent = email;
+        document.getElementById('modalPhone').textContent = phone;
+        document.getElementById('viewModal').style.display = 'block';
+    }
+
+    function openEditModal(id, name, specialization, status, hired, email, phone) {
+        document.getElementById('editId').value = id;
+        document.getElementById('editName').value = name;
+        document.getElementById('editFitnessProgram').value = specialization;
+        document.getElementById('editStatus').value = status;
+        document.getElementById('editHired').value = hired;
+        document.getElementById('editEmail').value = email;
+        document.getElementById('editPhone').value = phone;
+
+        // Fixed URL construction to match urls.py pattern
+        const editForm = document.getElementById('editForm');
+        editForm.action = `/trainers/edit/${id}/`;
+
+        document.getElementById('editModal').style.display = 'block';
+    }
+
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+        ['addModal', 'viewModal', 'editModal'].forEach(id => {
+            const modal = document.getElementById(id);
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    };
+</script>
 {% endblock %}
