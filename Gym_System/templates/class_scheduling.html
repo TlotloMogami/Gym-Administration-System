@@ -1,176 +1,275 @@
 {% extends 'base.html' %}
+{% load Custom_filters %}
 
-{% block search_bar %}
-<div class="search">
-    <input type="search" class="search-bar" placeholder="Search for {{ page_title }}">
-</div>
-{% endblock %}
 
 {% block content %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ page_title }}</title>
-    <style>
+<div class="container" style="margin-left: 300px; width: 80%; margin-top: -500px;">
 
-        .container {
-          margin-left: 300px;
-            width: 80%;
-            margin-top: -500px;
-        }
-        .class-list {
-            margin-bottom: 20px;
-        }
-        .schedule-btn {
-            padding: 12px 20px;
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        .schedule-btn:hover {
-            background: #0056b3;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-        }
-        .booking-form {
-            background: #fff;
-            padding: 30px;
-            max-width: 600px;
-            margin: 50px auto;
-            border-radius: 12px;
-            position: relative;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        .booking-form h2 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .close-modal {
-            position: absolute;
-            top: 10px;
-            right: 20px;
-            font-size: 24px;
-            cursor: pointer;
-        }
-        .form-group {
-            margin-bottom: 15px;
-            display: flex;
-            flex-direction: column;
-        }
-        label {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        select, input, textarea {
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 16px;
-        }
-        .submit-btn {
-            padding: 12px;
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        .submit-btn:hover {
-            background: #0056b3;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="class-list">
-            {% if classes %}
-                <ul>
-                    {% for cls in classes %}
-                        <li>{{ cls.name }} - {{ cls.date }} at {{ cls.time }}</li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <h2>No classes scheduled.</h2>
-            {% endif %}
-        </div>
-
-        <!-- Schedule Class Button -->
-        <button class="schedule-btn" onclick="document.getElementById('scheduleModal').style.display='block'">
-            Schedule a Class
-        </button>
-
-        <!-- Modal -->
-        <div id="scheduleModal" class="modal">
-            <div class="booking-form">
-                <span class="close-modal" onclick="document.getElementById('scheduleModal').style.display='none'">&times;</span>
-                <h2>Book a Class</h2>
-                <form>
-                    <div class="form-group">
-                        <label for="category">Category</label>
-                        <select id="category">
-                            <option value="">Select Category</option>
-                            <option value="yoga">Yoga</option>
-                            <option value="fitness">Fitness</option>
-                            <option value="dance">Dance</option>
-                            <option value="martial-arts">Martial Arts</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="trainer">Trainer / Instructor</label>
-                        <select id="trainer">
-                            <option value="">Select Trainer</option>
-                            <!-- Dynamically populated based on category if needed -->
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="date">Date</label>
-                        <input type="date" id="date" />
-                    </div>
-
-                    <div class="form-group">
-                        <label for="time">Time</label>
-                        <input type="time" id="time" />
-                    </div>
-
-                    <div class="form-group">
-                        <label for="duration">Duration (minutes)</label>
-                        <input type="number" id="duration" placeholder="e.g. 60" />
-                    </div>
-
-                    <div class="form-group">
-                        <label for="location">Location / Room</label>
-                        <input type="text" id="location" placeholder="e.g. Room 101" />
-                    </div>
-
-                
-                    <button type="submit" class="submit-btn">Book Class</button>
-                </form>
-            </div>
-        </div>
+    <div class="class-list">
+        {% if scheduled_classes %}
+        <table border="1" cellpadding="8" cellspacing="0" style="width:80%; border-collapse: collapse;">
+            <thead>
+                <tr>
+                    <th>Venue</th>
+                    <th>Trainer</th>
+                    <th>Fitness Program</th>    
+                    <th>Duration (minutes)</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cls in scheduled_classes %}
+                <tr>
+                    <td>{{ cls.venue.name }}</td>
+                    <td>{{ cls.trainer.name }}</td>
+                    <td>{{ cls.trainer.fitness_programs }}</td>
+                    <td>{{ cls.duration }}</td>
+                    <td>{{ cls.date|date:"M d, Y" }}</td>
+                    <td>
+                        <button onclick="deleteClass({{ cls.id }})" style="color: red; border: none; background: none; cursor: pointer;">
+                            🗑 Delete
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <h3>No classes scheduled.</h3>
+        {% endif %}
     </div>
 
-    <script>
-        // Close modal when clicking outside the form
-        window.onclick = function(event) {
-            var modal = document.getElementById('scheduleModal');
-            if (event.target === modal) {
-                modal.style.display = "none";
-            }
+    <!-- Schedule Class Button -->
+    <button class="schedule-btn" onclick="document.getElementById('scheduleModal').style.display='block'">
+        Schedule a Class
+    </button>
+
+    <!-- Modal -->
+    <div id="scheduleModal" class="modal">
+        <div class="booking-form">
+            <span class="close-modal" onclick="document.getElementById('scheduleModal').style.display='none'">&times;</span>
+            <h2>Book a Class</h2>
+            <form id="scheduleForm">
+                <div class="form-group">
+                    <label for="category">Category</label>
+                    <select id="category" required>
+                        <option value="">Select Category</option>
+                        <option value="yoga">Yoga</option>
+                        <option value="weight training">Weight Training</option>
+                        <option value="zumba">Zumba</option>
+                        <option value="pilates">Pilates</option>
+                        <option value="crossFit">CrossFit</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="trainer">Trainer / Instructor</label>
+                    <select id="trainer" required>
+                        <option value="">Select Trainer</option>
+                        {% for trainer in trainers %}
+                        <option value="{{ trainer.id }}" data-programs="{{ trainer.fitness_programs }}">{{ trainer.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="date">Date</label>
+                    <input type="date" id="date" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="time">Time</label>
+                    <input type="time" id="time" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="duration">Duration (minutes)</label>
+                    <input type="number" id="duration" placeholder="e.g. 60" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="venue">Venue / Room</label>
+                    <select id="venue" name="venue" required>
+                        <option value="">Select Venue</option>
+                        {% for venue in venues %}
+                        <option value="{{ venue.id }}">{{ venue.name }} (Capacity: {{ venue.capacity }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <button type="submit" class="submit-btn">Book Class</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Close modal when clicking outside
+    window.onclick = function (event) {
+        var modal = document.getElementById('scheduleModal');
+        if (event.target === modal) {
+            modal.style.display = "none";
         }
-    </script>
-</body>
-</html>
+    }
+
+    // Filter trainers by category
+    document.getElementById('category').addEventListener('change', function () {
+        const category = this.value;
+        const trainerSelect = document.getElementById('trainer');
+        trainerSelect.innerHTML = '<option value="">Select Trainer</option>';
+
+        if (category) {
+            fetch(`/api/trainers/?category=${encodeURIComponent(category)}`)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(trainer => {
+                        const option = document.createElement('option');
+                        option.value = trainer.id;
+                        option.textContent = trainer.name;
+                        trainerSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching trainers:', error);
+                });
+        }
+    });
+
+    // Handle form submission
+    document.getElementById("scheduleForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const data = {
+            trainer: document.getElementById("trainer").value,
+            category: document.getElementById("category").value,
+            date: document.getElementById("date").value,
+            time: document.getElementById("time").value,
+            duration: document.getElementById("duration").value,
+            location: document.getElementById("venue").value,
+        };
+
+        fetch("{% url 'schedule_class' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert("Error: " + data.message);
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Something went wrong.");
+        });
+    });
+
+    // Delete scheduled class
+    function deleteClass(classId) {
+        if (confirm("Are you sure you want to delete this class?")) {
+            fetch(`/api/delete-class/${classId}/`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}"
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert("Error: " + data.message);
+                }
+            })
+            .catch(error => {
+                console.error("Delete error:", error);
+                alert("Something went wrong.");
+            });
+        }
+    }
+</script>
+
+<style>
+    .schedule-btn {
+        padding: 12px 20px;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-top: 20px;
+    }
+
+    .schedule-btn:hover {
+        background: #0056b3;
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+    }
+
+    .booking-form {
+        background: #fff;
+        padding: 30px;
+        max-width: 600px;
+        margin: 50px auto;
+        border-radius: 12px;
+        position: relative;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    label {
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    select, input {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 16px;
+    }
+
+    .submit-btn {
+        padding: 12px;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    .submit-btn:hover {
+        background: #0056b3;
+    }
+
+    .close-modal {
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        font-size: 24px;
+        cursor: pointer;
+    }
+</style>
 {% endblock %}
