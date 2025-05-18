@@ -1,3 +1,7 @@
-from django.contrib import admin
+from django import forms
+from .models import Member
 
-# Register your models here.
+class MemberForm(forms.ModelForm):
+    class Meta:
+        model = Member
+        fields = ['name', 'gender', 'dob', 'membership_type', 'status', 'joined', 'email', 'phone', 'address']
