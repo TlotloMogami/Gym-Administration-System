@@ -42,11 +42,11 @@ python manage.py runserver
 
 Then open your browser and go to http://127.0.0.1:8000/.
 
-📚 About the Project
+# 📚 About the Project
 
 This project was developed as part of a final-year Database Systems module for a Computer Science degree. It is designed to help students better understand how database operations integrate with full-stack web development.
 
 Contributions are welcome! Feel free to fork the repository and open a pull request.
 
-📄 License
+# License
 This project is for educational purposes. You may use and modify it freely.
