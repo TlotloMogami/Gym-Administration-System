@@ -29,10 +29,12 @@ pip install django
 
 # Make Migrations
 -Python manage.py makemigrations
+
 -python manage.py migrate
 
 # Create login credentials to the system
--Python manage.py createsuperuser 
+-Python manage.py createsuperuser
+
 -Then enter the required information.
 
 # Run the server
