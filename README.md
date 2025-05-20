@@ -1,27 +1,27 @@
 
-🏋️ Gym Administration System
+# 🏋️ Gym Administration System
 
 A simple and modern Gym Admin Dashboard built with HTML, CSS, JavaScript, and Bootstrap 5, integrated with Django on the backend. This system mimics the core functionalities of a fitness facility and serves as a step forward from traditional file-based data storage to a more manageable and scalable database system.
 
 It combines essential activities like member registration and payment handling into one unified platform for better data organization and efficiency.
 
-🛠️ Technologies Used
+# 🛠️ Technologies Used
 
     Frontend: HTML, CSS, JavaScript, Bootstrap 5
     Backend: Python (Django Framework)
     Database: SQLite
 
-🚀 Features
+# 🚀 Features
 
     ✅ User Authentication System
     📊 Chart.js for Data Visualization
     ✏️ Full CRUD Operations for managing members, trainers, classes, and more
 
-🧪 Getting Started
+# 🧪 Getting Started
 
 To run the project locally, follow these steps:
 
-# Navigate to the project directory
+# Navigate to the app directory
 cd Gym_System
 
 # Install Django
